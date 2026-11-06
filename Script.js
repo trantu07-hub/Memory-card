@@ -895,8 +895,12 @@ function renderVocabularyCard(word, side) {
   back.setAttribute("aria-hidden", "false");
   const backMark = document.createElement("span");
   backMark.className = "vocab-card-back-mark";
-  backMark.textContent = "✦";
   backMark.setAttribute("aria-hidden", "true");
+  for (const length of ["long", "short", "medium"]) {
+    const line = document.createElement("span");
+    line.className = `vocab-card-back-line is-${length}`;
+    backMark.append(line);
+  }
   const backLabel = document.createElement("span");
   backLabel.className = "vocab-card-back-label";
   backLabel.textContent = "MEMORY";

@@ -508,7 +508,11 @@ button { color: inherit; }
 .vocab-choice.is-flipped .vocab-card-inner { transform: rotateY(180deg); }
 .vocab-card-face { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; overflow: hidden; padding: 13px; border: 1px solid var(--line); border-radius: inherit; text-align: center; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: var(--shadow-card); }
 .vocab-card-back { border-color: rgba(24, 53, 42, 0.38); color: rgba(255, 254, 250, 0.76); background: var(--card-back); }
-.vocab-card-back-mark { font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1; }
+.vocab-card-back-mark { width: clamp(30px, 3vw, 38px); display: grid; gap: 5px; }
+.vocab-card-back-line { display: block; height: 3px; border-radius: 2px; background: currentColor; opacity: 0.82; }
+.vocab-card-back-line.is-long { width: 100%; }
+.vocab-card-back-line.is-medium { width: 76%; }
+.vocab-card-back-line.is-short { width: 54%; }
 .vocab-card-back-label, .vocab-card-type { font-size: 0.62rem; font-weight: 750; letter-spacing: 0.12em; }
 .vocab-card-front { transform: rotateY(180deg); color: var(--ink); background: #fffefa; }
 .vocab-english-card .vocab-card-front { gap: 13px; }
