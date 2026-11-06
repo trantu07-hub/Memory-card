@@ -31,7 +31,7 @@ const VOCAB_DECKS_KEY = "memory-card-vocabulary-decks-v1";
 const VOCAB_BEST_KEY = "memory-card-vocabulary-best-v1";
 const VOCAB_IMAGE_DB = "memory-card-vocabulary-images";
 const VOCAB_IMAGE_STORE = "images";
-const VOCAB_MISMATCH_DELAY = 600;
+const VOCAB_MISMATCH_DELAY = 850;
 const VOCAB_TOPICS = {
   animals: {
     label: "Animals",
@@ -145,8 +145,7 @@ const vocabImagePreview = $("vocab-image-preview");
 const vocabularyForm = $("vocabulary-form");
 const vocabularyGameScreen = $("vocabulary-game-screen");
 const vocabularyWinOverlay = $("vocab-win-overlay");
-const englishWordCards = $("english-word-cards");
-const vietnameseMeaningCards = $("vietnamese-meaning-cards");
+const vocabCardBoard = $("vocab-card-board");
 const vocabGameFeedback = $("vocab-game-feedback");
 const vocabStorageStatus = $("vocab-storage-status");
 
@@ -179,7 +178,7 @@ const state = {
   vocabPreviewToken: 0,
   vocabGame: {
     words: [],
-    selectedEnglishId: null,
+    selectedCards: [],
     locked: false,
     attempts: 0,
     correctMatches: 0,
@@ -852,19 +851,6 @@ async function initializeVocabulary() {
 }
 
 /* ---------- Vocabulary Match gameplay ---------- */
-function shuffleVocabularyWords(words) {
-  const shuffled = shuffle(words);
-  let attempts = 0;
-  while (shuffled.every((word, index) => word.id === words[index].id) && attempts < 20) {
-    shuffled.splice(0, shuffled.length, ...shuffle(words));
-    attempts++;
-  }
-  if (words.length > 1 && shuffled.every((word, index) => word.id === words[index].id)) {
-    shuffled.splice(0, shuffled.length, ...words.slice(1), words[0]);
-  }
-  return shuffled;
-}
-
 function createRandomVocabulary(topicId, count) {
   return shuffle(VOCAB_TOPICS[topicId].words).slice(0, count).map(([english, meaning, illustration]) => ({
     id: `random-${topicId}-${english}`,
@@ -889,8 +875,7 @@ function updateVocabularyStats() {
   $("vocab-stat-accuracy").textContent = `${getVocabularyAccuracy()}%`;
   $("vocab-stat-time").textContent = formatTime(game.elapsed);
   const remaining = game.words.length - game.correctMatches;
-  $("english-remaining").textContent = `${remaining} còn lại`;
-  $("meaning-remaining").textContent = `${remaining} còn lại`;
+  $("vocab-cards-remaining").textContent = `${remaining} cặp còn lại`;
 }
 
 function renderVocabularyCard(word, side) {
@@ -899,32 +884,66 @@ function renderVocabularyCard(word, side) {
   card.className = `vocab-choice vocab-${side}-card`;
   card.dataset.vocabularyId = word.id;
   card.dataset.side = side;
+  card.setAttribute("aria-label", "Thẻ đang úp");
+  card.setAttribute("aria-pressed", "false");
+
+  const inner = document.createElement("span");
+  inner.className = "vocab-card-inner";
+
+  const back = document.createElement("span");
+  back.className = "vocab-card-face vocab-card-back";
+  back.setAttribute("aria-hidden", "false");
+  const backMark = document.createElement("span");
+  backMark.className = "vocab-card-back-mark";
+  backMark.textContent = "✦";
+  backMark.setAttribute("aria-hidden", "true");
+  const backLabel = document.createElement("span");
+  backLabel.className = "vocab-card-back-label";
+  backLabel.textContent = "MEMORY";
+  backLabel.setAttribute("aria-hidden", "true");
+  back.append(backMark, backLabel);
+
+  const front = document.createElement("span");
+  front.className = "vocab-card-face vocab-card-front";
+  front.setAttribute("aria-hidden", "true");
   if (side === "english") {
+    const label = document.createElement("span");
+    label.className = "vocab-card-type";
+    label.textContent = "ENGLISH";
     const text = document.createElement("span");
     text.className = "vocab-english-text";
     text.textContent = word.english;
-    card.append(text);
+    front.append(label, text);
   } else {
     if (word.imageUrl) {
       const image = document.createElement("img");
       image.className = "vocab-meaning-image";
       image.src = word.imageUrl;
       image.alt = "";
-      card.append(image);
+      front.append(image);
     } else {
       const illustration = document.createElement("span");
       illustration.className = "vocab-meaning-illustration";
       illustration.textContent = word.illustration || "✦";
       illustration.setAttribute("aria-hidden", "true");
-      card.append(illustration);
+      front.append(illustration);
     }
     const meaning = document.createElement("span");
     meaning.className = "vocab-meaning-text";
     meaning.textContent = word.meaning;
-    card.append(meaning);
+    front.append(meaning);
   }
-  card.setAttribute("aria-label", side === "english" ? word.english : word.meaning);
+  inner.append(back, front);
+  card.append(inner);
   return card;
+}
+
+function shuffleVocabularyCards(words) {
+  const cards = words.flatMap((word) => [
+    { word, side: "english" },
+    { word, side: "meaning" }
+  ]);
+  return shuffle(cards);
 }
 
 async function startVocabularyGame(words, bestKey, deckName) {
@@ -937,7 +956,7 @@ async function startVocabularyGame(words, bestKey, deckName) {
     clearTimeout(game.winTimeout);
     releaseVocabularyImageUrls();
     game.words = words.map((word) => ({ ...word, imageUrl: null }));
-    game.selectedEnglishId = null;
+    game.selectedCards = [];
     game.locked = false;
     game.attempts = 0;
     game.correctMatches = 0;
@@ -961,18 +980,8 @@ async function startVocabularyGame(words, bestKey, deckName) {
       }
     }
 
-    const englishWords = shuffleVocabularyWords(game.words);
-    let meanings = shuffleVocabularyWords(game.words);
-    let attempts = 0;
-    while (meanings.every((word, index) => word.id === englishWords[index].id) && attempts < 20) {
-      meanings = shuffleVocabularyWords(game.words);
-      attempts++;
-    }
-    if (meanings.every((word, index) => word.id === englishWords[index].id) && meanings.length > 1) {
-      meanings = [...englishWords.slice(1), englishWords[0]];
-    }
-    englishWordCards.replaceChildren(...englishWords.map((word) => renderVocabularyCard(word, "english")));
-    vietnameseMeaningCards.replaceChildren(...meanings.map((word) => renderVocabularyCard(word, "meaning")));
+    const cards = shuffleVocabularyCards(game.words);
+    vocabCardBoard.replaceChildren(...cards.map(({ word, side }) => renderVocabularyCard(word, side)));
     $("vocab-game-title").textContent = deckName;
     menuScreen.hidden = true;
     gameScreen.hidden = true;
@@ -1021,47 +1030,35 @@ function startVocabularyTimer() {
 
 function handleVocabularyCardClick(event) {
   const card = event.target.closest(".vocab-choice");
-  if (!card || state.vocabGame.locked || card.classList.contains("is-matched")) return;
+  if (!card || !vocabCardBoard.contains(card) || state.vocabGame.locked
+    || card.classList.contains("is-matched") || card.classList.contains("is-flipped")) return;
   const game = state.vocabGame;
-  const side = card.dataset.side;
-  const vocabularyId = card.dataset.vocabularyId;
-
-  if (side === "english") {
-    if (game.selectedEnglishId) {
-      if (game.selectedEnglishId === vocabularyId) {
-        game.selectedEnglishId = null;
-        card.classList.remove("is-selected");
-        vocabGameFeedback.textContent = "Chọn một từ tiếng Anh để bắt đầu ghép.";
-      }
-      return;
-    }
-    game.selectedEnglishId = vocabularyId;
-    card.classList.add("is-selected");
-    startVocabularyTimer();
-    vocabGameFeedback.textContent = "Bây giờ hãy chọn nghĩa tiếng Việt tương ứng.";
-    return;
-  }
-
-  if (!game.selectedEnglishId) {
-    vocabGameFeedback.textContent = "Hãy chọn một từ tiếng Anh trước.";
-    return;
-  }
-
-  const selectedEnglish = englishWordCards.querySelector(
-    `.vocab-choice[data-vocabulary-id="${CSS.escape(game.selectedEnglishId)}"]`
-  );
-  game.locked = true;
-  game.attempts++;
+  card.classList.add("is-flipped");
+  card.setAttribute("aria-pressed", "true");
+  card.setAttribute("aria-label", card.dataset.side === "english"
+    ? `Từ tiếng Anh: ${card.querySelector(".vocab-english-text").textContent}`
+    : `Nghĩa tiếng Việt: ${card.querySelector(".vocab-meaning-text").textContent}`);
+  card.querySelector(".vocab-card-back").setAttribute("aria-hidden", "true");
+  card.querySelector(".vocab-card-front").setAttribute("aria-hidden", "false");
+  game.selectedCards.push(card);
   startVocabularyTimer();
 
-  if (game.selectedEnglishId === vocabularyId) {
-    selectedEnglish.classList.remove("is-selected");
-    selectedEnglish.classList.add("is-matched");
-    card.classList.add("is-matched");
-    selectedEnglish.disabled = true;
-    card.disabled = true;
+  if (game.selectedCards.length < 2) {
+    vocabGameFeedback.textContent = "Hãy lật thêm một thẻ để tìm cặp.";
+    return;
+  }
+
+  const [firstCard, secondCard] = game.selectedCards;
+  game.locked = true;
+  game.attempts++;
+
+  if (firstCard.dataset.vocabularyId === secondCard.dataset.vocabularyId) {
+    firstCard.classList.add("is-matched");
+    secondCard.classList.add("is-matched");
+    firstCard.disabled = true;
+    secondCard.disabled = true;
     game.correctMatches++;
-    game.selectedEnglishId = null;
+    game.selectedCards = [];
     game.locked = false;
     vocabGameFeedback.textContent = "Đúng rồi! Hãy tiếp tục.";
     updateVocabularyStats();
@@ -1069,17 +1066,22 @@ function handleVocabularyCardClick(event) {
     return;
   }
 
-  selectedEnglish.classList.add("is-incorrect");
-  card.classList.add("is-incorrect");
+  firstCard.classList.add("is-incorrect");
+  secondCard.classList.add("is-incorrect");
   vocabGameFeedback.textContent = "Chưa đúng. Thử lại nhé.";
   updateVocabularyStats();
   game.mismatchTimeout = setTimeout(() => {
-    selectedEnglish.classList.remove("is-selected", "is-incorrect");
-    card.classList.remove("is-incorrect");
-    game.selectedEnglishId = null;
+    for (const selectedCard of game.selectedCards) {
+      selectedCard.classList.remove("is-flipped", "is-incorrect");
+      selectedCard.setAttribute("aria-pressed", "false");
+      selectedCard.setAttribute("aria-label", "Thẻ đang úp");
+      selectedCard.querySelector(".vocab-card-back").setAttribute("aria-hidden", "false");
+      selectedCard.querySelector(".vocab-card-front").setAttribute("aria-hidden", "true");
+    }
+    game.selectedCards = [];
     game.mismatchTimeout = null;
     game.locked = false;
-    vocabGameFeedback.textContent = "Chọn một từ tiếng Anh để tiếp tục.";
+    vocabGameFeedback.textContent = "Chọn hai thẻ để tìm cặp tiếp theo.";
   }, VOCAB_MISMATCH_DELAY);
 }
 
@@ -1504,8 +1506,7 @@ $("vocab-win-restart").addEventListener("click", () => {
   const game = state.vocabGame;
   startVocabularyGame(game.words, game.bestKey, game.deckName);
 });
-englishWordCards.addEventListener("click", handleVocabularyCardClick);
-vietnameseMeaningCards.addEventListener("click", handleVocabularyCardClick);
+vocabCardBoard.addEventListener("click", handleVocabularyCardClick);
 vocabDifficultySelect.addEventListener("change", () => {
   vocabCountInput.value = { easy: 5, medium: 8, hard: 12 }[vocabDifficultySelect.value];
   $("random-vocab-error").textContent = "";

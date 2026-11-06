@@ -224,7 +224,7 @@
     <section id="vocabulary-game-screen" class="screen vocabulary-game-screen" hidden>
       <div class="game-heading">
         <div><p class="eyebrow">VOCABULARY MATCH</p><h1 id="vocab-game-title" class="game-title">Ghép từ và nghĩa.</h1></div>
-        <span class="game-hint">Chọn một từ và nghĩa tương ứng</span>
+        <span class="game-hint">Lật hai thẻ để tìm từ và nghĩa tương ứng</span>
       </div>
       <div class="vocab-stats stats" aria-live="off">
         <div class="stat"><span class="stat-label">Tổng cặp</span><span class="stat-value" id="vocab-stat-total">0</span></div>
@@ -234,16 +234,13 @@
         <div class="stat"><span class="stat-label">Chính xác</span><span class="stat-value" id="vocab-stat-accuracy">0%</span></div>
         <div class="stat"><span class="stat-label">Thời gian</span><span class="stat-value" id="vocab-stat-time">00:00</span></div>
       </div>
-      <div class="vocab-columns">
-        <section class="vocab-column" aria-labelledby="english-column-title">
-          <div class="vocab-column-heading"><h2 id="english-column-title">English words</h2><span id="english-remaining" class="column-count"></span></div>
-          <div id="english-word-cards" class="vocab-card-list"></div>
-        </section>
-        <section class="vocab-column" aria-labelledby="meaning-column-title">
-          <div class="vocab-column-heading"><h2 id="meaning-column-title">Nghĩa tiếng Việt</h2><span id="meaning-remaining" class="column-count"></span></div>
-          <div id="vietnamese-meaning-cards" class="vocab-card-list"></div>
-        </section>
-      </div>
+      <section class="vocab-board-section" aria-labelledby="vocab-board-title">
+        <div class="vocab-column-heading">
+          <h2 id="vocab-board-title">Các thẻ từ vựng</h2>
+          <span id="vocab-cards-remaining" class="column-count"></span>
+        </div>
+        <div id="vocab-card-board" class="vocab-card-board"></div>
+      </section>
       <div class="actions vocab-game-actions">
         <button type="button" id="vocab-restart-btn" class="btn btn-primary">Chơi lại</button>
         <button type="button" id="vocab-menu-btn" class="btn btn-ghost">Về bộ từ</button>
