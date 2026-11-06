@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Setting up character encoding and responsive viewport for cross-device compatibility -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <!-- Linking the enhanced stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Importing Google Fonts for elegant, modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Game title header -->
+    <header>
+        <h1>MEMORY CARD GAME</h1>
+    </header>
+    <!-- Game board containing all memory ./assets/card in a 4x4 grid -->
+    <section class="game-board">
+        <!-- Individual card with consistent front face and unique back face -->
+        <div class="memory-card" data-framework="A">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img1.jpg" alt="Mickey">
+        </div>
+        <div class="memory-card" data-framework="A">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img1.jpg" alt="Mickey">
+        </div>
+        <div class="memory-card" data-framework="B">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img2.jpg" alt="Mowgli">
+        </div>
+        <div class="memory-card" data-framework="B">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img2.jpg" alt="Mowgli">
+        </div>
+        <div class="memory-card" data-framework="C">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img3.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="C">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img3.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="D">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img4.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="D">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img4.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="E">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img5.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="E">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img5.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="F">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img6.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="F">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img6.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="G">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img7.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="G">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img7.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="H">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img8.jpg" alt="Memory Card">
+        </div>
+        <div class="memory-card" data-framework="H">
+            <img class="front-face" src="./assets/card.jpeg" alt="Card Front">
+            <img class="back-face" src="./assets/img8.jpg" alt="Memory Card">
+        </div>
+    </section>
+    <!-- Score and timer display -->
+    <section class="score-board">
+        <div>Time: <span id="time">0</span> seconds</div>
+        <div>Score: <span id="score">0</span></div>
+    </section>
+    <!-- Enhanced congratulations popup with animation -->
+    <div id="congratulations" class="hidden">
+        <h2>Congratulations!</h2>
+        <p>Your score is: <span id="final-score"></span></p>
+        <p>Your time is: <span id="final-time"></span> seconds</p>
+        <button id="replay-button">Play Again</button>
+    </div>
+    <!-- Linking the game logic script -->
+    <script src="script.js"></script>
+</body>
+</html>

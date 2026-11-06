@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Memory Card</title>
+  <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <div class="brand" aria-label="Memory Card">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+        <span>Memory Card</span>
+      </div>
+      <span class="header-note">Một chút thư giãn cho trí nhớ</span>
+    </header>
+
+    <!-- Màn hình chọn độ khó -->
+    <section id="menu-screen" class="screen">
+      <div class="page-intro">
+        <p class="eyebrow">TRÒ CHƠI GHI NHỚ</p>
+        <h1 class="title">Chơi và khám phá.</h1>
+        <p class="lead">Thử thách trí nhớ hoặc học từ mới qua hình ảnh.</p>
+      </div>
+
+      <div class="game-mode-switch" role="radiogroup" aria-label="Chọn trò chơi">
+        <button type="button" class="game-mode-choice is-selected" role="radio" aria-checked="true" data-game-mode="classic">
+          <span class="game-mode-icon" aria-hidden="true">▧</span>
+          <span><strong>Classic Memory</strong><small>Lật thẻ tìm các cặp giống nhau</small></span>
+        </button>
+        <button type="button" class="game-mode-choice" role="radio" aria-checked="false" data-game-mode="vocabulary">
+          <span class="game-mode-icon" aria-hidden="true">Aa</span>
+          <span><strong>Vocabulary Match</strong><small>Ghép từ tiếng Anh với nghĩa tiếng Việt</small></span>
+        </button>
+      </div>
+
+      <div id="classic-mode-settings">
+        <div class="modes" role="radiogroup" aria-label="Độ khó">
+        <button type="button" class="mode is-selected" role="radio" aria-checked="true" data-mode="easy">
+          <span class="mode-name">Dễ</span>
+          <span class="mode-info">4 cặp · 8 thẻ</span>
+          <span class="mode-best" data-best="easy">Chưa có kỷ lục</span>
+        </button>
+        <button type="button" class="mode" role="radio" aria-checked="false" data-mode="medium">
+          <span class="mode-name">Vừa</span>
+          <span class="mode-info">8 cặp · 16 thẻ</span>
+          <span class="mode-best" data-best="medium">Chưa có kỷ lục</span>
+        </button>
+        <button type="button" class="mode" role="radio" aria-checked="false" data-mode="hard">
+          <span class="mode-name">Khó</span>
+          <span class="mode-info">12 cặp · 24 thẻ</span>
+          <span class="mode-best" data-best="hard">Chưa có kỷ lục</span>
+        </button>
+        <button type="button" class="mode" role="radio" aria-checked="false" data-mode="custom">
+          <span class="mode-name">Tùy chỉnh</span>
+          <span class="mode-info">Tự chọn cặp và ảnh</span>
+          <span class="mode-best" data-best="custom">Chưa có kỷ lục</span>
+        </button>
+        </div>
+
+        <button type="button" id="start-btn" class="btn btn-primary">Bắt đầu</button>
+
+        <section id="custom-settings" class="custom-settings" aria-labelledby="custom-title" hidden>
+        <div class="custom-heading">
+          <div>
+            <p class="eyebrow">TẠO VÁN CHƠI CỦA BẠN</p>
+            <h2 id="custom-title">Chế độ tùy chỉnh</h2>
+          </div>
+          <span class="private-note">Ảnh chỉ lưu trên thiết bị này</span>
+        </div>
+        <div class="custom-config">
+          <div class="custom-field">
+            <label for="custom-pairs">Số cặp thẻ</label>
+            <input id="custom-pairs" type="number" min="2" max="30" value="4" inputmode="numeric">
+            <span class="field-help">Từ 2 đến 30 cặp</span>
+          </div>
+          <div class="custom-field upload-field">
+            <label for="custom-files">Ảnh của bạn</label>
+            <input id="custom-files" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple>
+            <span class="field-help">JPG, PNG hoặc WEBP · tối đa 5 MB mỗi ảnh, 30 MB tổng</span>
+          </div>
+        </div>
+        <div class="upload-summary">
+          <p id="custom-image-count" class="custom-hint" aria-live="polite">Đã chọn 0 ảnh.</p>
+          <p id="custom-message" class="custom-message" aria-live="polite"></p>
+        </div>
+        <section class="preview-section" aria-labelledby="preview-title">
+          <div class="custom-preview-header">
+            <h3 id="preview-title">Ảnh đã chọn</h3>
+            <button type="button" id="clear-images-btn" class="btn btn-ghost btn-small">Xóa tất cả</button>
+          </div>
+          <ul id="custom-preview" class="custom-preview"></ul>
+        </section>
+        <p id="custom-error" class="custom-error" role="alert"></p>
+        <div class="actions">
+          <button type="button" id="custom-start-btn" class="btn btn-primary">Start Game</button>
+          <button type="button" id="custom-back-btn" class="btn btn-ghost">Quay lại chọn chế độ</button>
+        </div>
+        </section>
+      </div>
+
+      <section id="vocabulary-settings" class="vocabulary-settings" aria-label="Cài đặt Vocabulary Match" hidden>
+        <div class="vocab-mode-tabs" role="radiogroup" aria-label="Nguồn từ vựng">
+          <button type="button" class="vocab-mode-tab is-selected" role="radio" aria-checked="true" data-vocab-source="random">Từ vựng ngẫu nhiên</button>
+          <button type="button" class="vocab-mode-tab" role="radio" aria-checked="false" data-vocab-source="custom">Bộ từ của tôi</button>
+        </div>
+
+        <section id="random-vocab-panel" class="vocab-panel">
+          <div class="vocab-panel-heading">
+            <div><p class="eyebrow">LUYỆN TẬP THEO CHỦ ĐỀ</p><h2>Chọn bộ từ</h2></div>
+            <p class="panel-description">Tìm từ tiếng Anh khớp với nghĩa và hình minh họa.</p>
+          </div>
+          <div class="vocab-config">
+            <div class="custom-field">
+              <label for="vocab-topic">Chủ đề</label>
+              <select id="vocab-topic"></select>
+            </div>
+            <div class="custom-field">
+              <label for="vocab-difficulty">Độ khó</label>
+              <select id="vocab-difficulty">
+                <option value="easy">Dễ · 5 từ</option>
+                <option value="medium">Vừa · 8 từ</option>
+                <option value="hard">Khó · 12 từ</option>
+              </select>
+            </div>
+            <div class="custom-field">
+              <label for="vocab-count">Số từ</label>
+              <input id="vocab-count" type="number" min="2" max="12" value="5" inputmode="numeric">
+              <span class="field-help">Từ 2 đến 12 từ mỗi lượt</span>
+            </div>
+          </div>
+          <p id="random-vocab-error" class="custom-error" role="alert"></p>
+          <div class="actions">
+            <button type="button" id="random-vocab-start" class="btn btn-primary">Bắt đầu học</button>
+          </div>
+        </section>
+
+        <section id="custom-vocab-panel" class="vocab-panel" hidden>
+          <div class="vocab-panel-heading">
+            <div><p class="eyebrow">TẠO NỘI DUNG CỦA RIÊNG BẠN</p><h2>Quản lý bộ từ</h2></div>
+            <p class="panel-description">Bộ từ và nghĩa được lưu trên thiết bị này.</p>
+          </div>
+
+          <div class="deck-create">
+            <div class="custom-field">
+              <label for="new-vocab-deck-name">Tên bộ từ mới</label>
+              <input id="new-vocab-deck-name" type="text" maxlength="60" placeholder="Ví dụ: Từ vựng du lịch">
+            </div>
+            <button type="button" id="create-vocab-deck" class="btn btn-ghost">Tạo bộ từ</button>
+          </div>
+          <div class="custom-field deck-select-field">
+            <label for="vocab-deck-select">Bộ từ đang chỉnh sửa</label>
+            <div class="deck-select-row">
+              <select id="vocab-deck-select"></select>
+              <button type="button" id="delete-vocab-deck" class="btn btn-ghost">Xóa bộ từ</button>
+            </div>
+          </div>
+
+          <form id="vocabulary-form" class="vocab-entry-form">
+            <h3 id="vocab-form-title">Thêm từ vựng</h3>
+            <div class="vocab-entry-fields">
+              <div class="custom-field">
+                <label for="vocab-english">English Word <span aria-hidden="true">*</span></label>
+                <input id="vocab-english" type="text" maxlength="80" required placeholder="Ví dụ: apple">
+              </div>
+              <div class="custom-field">
+                <label for="vocab-meaning">Vietnamese Meaning <span aria-hidden="true">*</span></label>
+                <input id="vocab-meaning" type="text" maxlength="160" required placeholder="Ví dụ: Quả táo">
+              </div>
+            </div>
+            <div class="custom-field vocab-image-field">
+              <label for="vocab-image">Ảnh minh họa (không bắt buộc)</label>
+              <input id="vocab-image" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+              <div id="vocab-image-preview" class="vocab-image-preview" hidden></div>
+              <span class="field-help">JPG, PNG hoặc WEBP · tối đa 5 MB. Ảnh được lưu cục bộ trong trình duyệt.</span>
+            </div>
+            <div class="actions form-actions">
+              <button type="submit" id="save-vocab-word" class="btn btn-primary">Add Vocabulary</button>
+              <button type="button" id="cancel-vocab-edit" class="btn btn-ghost" hidden>Hủy chỉnh sửa</button>
+            </div>
+            <p id="vocab-manager-error" class="custom-error" role="alert"></p>
+          </form>
+
+          <div class="vocab-list-heading">
+            <h3>Từ trong bộ <span id="vocab-word-count">(0)</span></h3>
+            <button type="button" id="preview-vocab-deck" class="btn btn-ghost btn-small">Xem trước</button>
+          </div>
+          <ul id="vocab-word-list" class="vocab-word-list"></ul>
+          <div id="vocab-deck-preview" class="vocab-deck-preview" hidden></div>
+          <p id="vocab-preview-error" class="custom-error" role="alert"></p>
+          <p id="vocab-storage-status" class="storage-status" aria-live="polite"></p>
+          <div class="actions">
+            <button type="button" id="custom-vocab-start" class="btn btn-primary">Chơi bộ từ này</button>
+          </div>
+        </section>
+      </section>
+    </section>
+
+    <!-- Màn hình chơi -->
+    <section id="game-screen" class="screen" hidden>
+      <div class="game-heading">
+        <div>
+          <p class="eyebrow">TẬP TRUNG MỘT CHÚT</p>
+          <h1 class="game-title">Tìm những cặp giống nhau.</h1>
+        </div>
+        <span class="game-hint">Chọn hai thẻ mỗi lượt</span>
+      </div>
+      <div class="stats" aria-live="off">
+        <div class="stat"><span class="stat-label">Lượt</span><span class="stat-value" id="stat-moves">0</span></div>
+        <div class="stat"><span class="stat-label">Thời gian</span><span class="stat-value" id="stat-time">00:00</span></div>
+        <div class="stat"><span class="stat-label">Cặp</span><span class="stat-value" id="stat-pairs">0/0</span></div>
+        <div class="stat"><span class="stat-label">Chính xác</span><span class="stat-value" id="stat-accuracy">0%</span></div>
+      </div>
+
+      <div id="board" class="board" data-mode="easy"></div>
+
+      <div class="actions">
+        <button type="button" id="restart-btn" class="btn btn-primary">Chơi lại</button>
+        <button type="button" id="menu-btn" class="btn btn-ghost">Đổi độ khó</button>
+      </div>
+    </section>
+
+    <section id="vocabulary-game-screen" class="screen vocabulary-game-screen" hidden>
+      <div class="game-heading">
+        <div><p class="eyebrow">VOCABULARY MATCH</p><h1 id="vocab-game-title" class="game-title">Ghép từ và nghĩa.</h1></div>
+        <span class="game-hint">Chọn một từ và nghĩa tương ứng</span>
+      </div>
+      <div class="vocab-stats stats" aria-live="off">
+        <div class="stat"><span class="stat-label">Tổng cặp</span><span class="stat-value" id="vocab-stat-total">0</span></div>
+        <div class="stat"><span class="stat-label">Đã ghép</span><span class="stat-value" id="vocab-stat-matched">0</span></div>
+        <div class="stat"><span class="stat-label">Lượt ghép</span><span class="stat-value" id="vocab-stat-attempts">0</span></div>
+        <div class="stat"><span class="stat-label">Cặp đúng</span><span class="stat-value" id="vocab-stat-correct">0</span></div>
+        <div class="stat"><span class="stat-label">Chính xác</span><span class="stat-value" id="vocab-stat-accuracy">0%</span></div>
+        <div class="stat"><span class="stat-label">Thời gian</span><span class="stat-value" id="vocab-stat-time">00:00</span></div>
+      </div>
+      <div class="vocab-columns">
+        <section class="vocab-column" aria-labelledby="english-column-title">
+          <div class="vocab-column-heading"><h2 id="english-column-title">English words</h2><span id="english-remaining" class="column-count"></span></div>
+          <div id="english-word-cards" class="vocab-card-list"></div>
+        </section>
+        <section class="vocab-column" aria-labelledby="meaning-column-title">
+          <div class="vocab-column-heading"><h2 id="meaning-column-title">Nghĩa tiếng Việt</h2><span id="meaning-remaining" class="column-count"></span></div>
+          <div id="vietnamese-meaning-cards" class="vocab-card-list"></div>
+        </section>
+      </div>
+      <div class="actions vocab-game-actions">
+        <button type="button" id="vocab-restart-btn" class="btn btn-primary">Chơi lại</button>
+        <button type="button" id="vocab-menu-btn" class="btn btn-ghost">Về bộ từ</button>
+      </div>
+      <p id="vocab-game-feedback" class="vocab-game-feedback" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <!-- Thông báo chiến thắng -->
+  <div id="win-overlay" class="overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="win-title">
+      <div class="dialog-emoji" aria-hidden="true">🎉</div>
+      <p class="eyebrow">HOÀN THÀNH VÁN CHƠI</p>
+      <h2 id="win-title">Tuyệt vời!</h2>
+      <p id="win-record" class="record" hidden>Kỷ lục mới!</p>
+      <dl class="result">
+        <div><dt>Lượt</dt><dd id="win-moves">0</dd></div>
+        <div><dt>Thời gian</dt><dd id="win-time">00:00</dd></div>
+        <div><dt>Chính xác</dt><dd id="win-accuracy">0%</dd></div>
+      </dl>
+      <p id="win-best" class="best-line"></p>
+      <div class="actions">
+        <button type="button" id="win-restart-btn" class="btn btn-primary">Chơi lại</button>
+        <button type="button" id="win-menu-btn" class="btn btn-ghost">Đổi độ khó</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="vocab-win-overlay" class="overlay" hidden>
+    <div class="dialog vocab-dialog" role="dialog" aria-modal="true" aria-labelledby="vocab-win-title">
+      <div class="dialog-emoji" aria-hidden="true">✦</div>
+      <p class="eyebrow">HOÀN THÀNH BỘ TỪ</p>
+      <h2 id="vocab-win-title">Bạn làm rất tốt!</h2>
+      <p id="vocab-win-record" class="record" hidden>Kỷ lục mới!</p>
+      <dl class="result vocab-result">
+        <div><dt>Thời gian</dt><dd id="vocab-win-time">00:00</dd></div>
+        <div><dt>Lượt ghép</dt><dd id="vocab-win-attempts">0</dd></div>
+        <div><dt>Chính xác</dt><dd id="vocab-win-accuracy">0%</dd></div>
+        <div><dt>Đúng</dt><dd id="vocab-win-correct">0/0</dd></div>
+      </dl>
+      <p id="vocab-win-best" class="best-line"></p>
+      <div class="actions">
+        <button type="button" id="vocab-win-restart" class="btn btn-primary">Chơi lại</button>
+        <button type="button" id="vocab-win-menu" class="btn btn-ghost">Về bộ từ</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="Script.js"></script>
+</body>
+</html>
